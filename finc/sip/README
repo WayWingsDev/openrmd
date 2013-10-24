@@ -1,0 +1,36 @@
+A SIP interface base on PJSIP.
+
+Usage on Windows:
+[include]
+..\pjsip\include
+..\pjlib\include
+..\pjlib-util\include
+..\pjmedia\include
+..\pjnath\include
+
+[lib]
+..\lib\libpjproject-i386-Win32-vc8-Debug.lib
+..\pjlib\lib\pjlib-i386-Win32-vc8-Debug.lib
+..\pjlib-util\lib\pjlib-util-i386-Win32-vc8-Debug.lib
+..\pjmedia\lib\pjmedia-audiodev-i386-Win32-vc8-Debug.lib
+..\pjmedia\lib\pjmedia-codec-i386-Win32-vc8-Debug.lib
+..\pjmedia\lib\pjmedia-i386-Win32-vc8-Debug.lib
+..\pjmedia\lib\pjmedia-videodev-i386-Win32-vc8-Debug.lib
+..\pjnath\lib\pjnath-i386-Win32-vc8-Debug.lib
+..\pjsip\lib\pjsip-core-i386-Win32-vc8-Debug.lib
+..\pjsip\lib\pjsip-simple-i386-Win32-vc8-Debug.lib
+..\pjsip\lib\pjsip-ua-i386-Win32-vc8-Debug.lib
+..\pjsip\lib\pjsua-lib-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libbaseclasses-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libg7221codec-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libgsmcodec-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libilbccodec-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libmilenage-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libportaudio-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libresample-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libspeex-i386-Win32-vc8-Debug.lib
+..\third_party\lib\libsrtp-i386-Win32-vc8-Debug.lib
+
+modify:
+  pjsip/src/pjsua-lib/pjsua_call.c
+  pjsip/src/pjsip-ua/sip_inv.c
