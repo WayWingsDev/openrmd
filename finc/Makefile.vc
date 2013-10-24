@@ -1,0 +1,10 @@
+CC	= cl
+CFLAGS	= /nologo /MT /W3 /O2 /wd4996 /D_WIN32_
+
+#obj	= $(patsubst %.c,%.o,$(wildcard *.c))
+
+#.c.obj:
+#	$(CC) $(CFLAGS) /Fo$*.obj -c $<
+
+clean:
+	-@erase *.obj *.ilk
