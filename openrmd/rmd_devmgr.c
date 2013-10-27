@@ -366,15 +366,24 @@ int rmd_devmgr_lookup_channel(int driver_type, int device_id, int channel_id,
 {
 	*driver = rmd_devmgr_get_driver(driver_type);
 	if (*driver == NULL)
+	{
+		syslog(LOG_DEBUG, "driver not found");
 		return -1;
+	}
 
 	*device = get_device(*driver, device_id);
 	if (*device == NULL)
+	{
+		syslog(LOG_DEBUG, "device:%d not found", device_id);
 		return -1;
+	}
 
 	*channel = get_channel(*driver, *device, channel_id);
 	if (*channel == NULL)
+	{
+		syslog(LOG_DEBUG, "channel:%d not found", channel_id);
 		return -1;
+	}
 
 	return 0;
 }

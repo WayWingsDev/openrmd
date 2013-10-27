@@ -15,6 +15,7 @@ int sockfd = -1;
 void uninit(int sig)
 {
 	close(sockfd);
+	printf("close sock\n");
 	exit(0);
 }
 
@@ -50,27 +51,27 @@ int main(int argc, char *argv[])
 	{
 		char buf[BUFFER_SIZE] = {0};
 		bzero(buf, BUFFER_SIZE);
-		recv(sockfd, buf, BUFFER_SIZE, 0);
-		printf("%s", buf);
+//		recv(sockfd, buf, BUFFER_SIZE, 0);
+//		printf("%s\n", buf);
 		scanf("%s", char_send);
 		fflush(stdin);
-		printf("\n");
+
 		if(strcmp(char_send, "exit") == 0)
 		{
-			if((byte = send(sockfd, char_send, 100, 0)) < 0)
+			if((byte = send(sockfd, char_send, sizeof(char_send), 0)) < 0)
 			{
 				printf("send error\n");
 				exit(1);
 			}
 			break;
 		}
-		if((byte = send(sockfd, char_send, 100, 0)) < 0)
+		if((byte = send(sockfd, char_send, sizeof(char_send), 0)) <= 0)
 		{
 			printf("send error\n");
 			exit(1);
 		}
 		printf("send size: %d\n", byte);
 	}
-//	close(sockfd);
+	close(sockfd);
 	return 0;
 }

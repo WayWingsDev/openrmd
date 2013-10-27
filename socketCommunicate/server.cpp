@@ -14,8 +14,7 @@
 #include <netinet/tcp.h>
 #include <signal.h>
 
-
-using namespace std;
+//using namespace std;
 
 #define PORT		 	5566		//port num of sock
 #define BACKLOG			2048		//max connections of sock, 2nd arg of listen
@@ -24,18 +23,77 @@ using namespace std;
 #define KEEPALIVE_IDEL	60			//start keepalives after period(seconds)
 #define KEEPALIVE_CNT	6			//number of keepalives before death
 #define KEEPALIVE_INTV	10			//interval of keepalives
+#ifndef BUFSIZE
 #define BUFSIZE			100
+#endif
 
 struct fd_t
 {
 	int sockfd;
 	int epfd;
 };
+
+int g_epfd;
+int g_sockfd;
 static int SockClient[MAXCLIENTS] = {0};
 static int icount = 0;
 int client_in(int, int);
 int client_out(int, int);
 void data_in(int, int);
+void del_invalid_client(int);
+
+#ifndef PATH_MAX
+#define PATH_MAX 512
+#endif
+/* value type */
+typedef enum {
+	GETCFG_INT32,	/* int */
+	GETCFG_UINT32,	/* unsigned int */
+	GETCFG_UINT64,	/* unsigned long long */
+	GETCFG_STR	/* string */
+} getcfg_val_t;
+
+int getcfg(char *file, char *key, void *val, getcfg_val_t t)
+{
+	FILE *fp;
+	char line[PATH_MAX], pkey[PATH_MAX], pval[PATH_MAX];
+
+	char buff[PATH_MAX];
+	char *p;
+	if (readlink("/proc/self/exe", buff, PATH_MAX) <= 0)
+		return -1;
+	printf("working path: %s\n", buff);
+	if((p = strrchr(buff, '/')) == NULL)
+		return -1;
+	char abs_path[PATH_MAX];
+	snprintf(abs_path, PATH_MAX, "%s%c%s", buff, '/', file);
+	printf("absolute path: %s\n", abs_path);
+
+	if ((fp = fopen(file, "r")) == NULL)
+		return -1;
+
+	while (fgets(line, sizeof(line), fp) != NULL) {
+		if (sscanf(line, "%[^=]=%s", pkey, pval) != 2 ||
+				strcmp(pkey, key) != 0)
+			continue;
+
+		if (t == GETCFG_INT32)
+			*(int *)val = atol(pval);
+		else if (t == GETCFG_UINT32)
+			*(uint32_t *)val = strtoul(pval, NULL, 0);
+		else if (t == GETCFG_UINT64)
+			*(uint64_t *)val = strtoull(pval, NULL, 0);
+		else
+			snprintf((char*)val, strlen(pval) + 1, pval);
+
+		fclose(fp);
+		return 0;
+	}
+
+	fclose(fp);
+	return -1;
+}
+
 void *loop_thread(void *fdall)
 {
 	fd_t fd = *((fd_t *)fdall);
@@ -53,12 +111,16 @@ void *loop_thread(void *fdall)
 		}
 		for(int i = 0; i < epoll_events; i++)
 		{
+			if( (events[i].events & EPOLLERR) || (events[i].events & EPOLLHUP)
+					|| (!(events[i].events & EPOLLIN)) )
+			{
+				client_out(events[i].data.fd, epfd);	
+				continue;
+			}
 			if(events[i].data.fd == sockfd)
 				client_in(sockfd, epfd);
-			else if(events[i].events & EPOLLIN)
-				data_in(events[i].data.fd, epfd);
 			else
-				client_out(events[i].data.fd, epfd);
+				data_in(events[i].data.fd, epfd);
 		}
 	}
 }
@@ -92,6 +154,10 @@ char *getcliip(const int sock)
 
 void uninit(int sig)
 {
+	close(g_sockfd);
+	printf("close sock\n");
+	close(g_epfd);
+	printf("close epoll\n");
 	exit(0);
 }
 
@@ -109,7 +175,7 @@ int main(int argc, char *argv[])
 	pthread_t tidsend, tidrecv;
 	sin_size = sizeof(struct sockaddr_in);
 
-	if(argc != 2)
+/*	if(argc != 2)
 	{
 		printf("%s paramete error! try again with port num\a\n", argv[0]);
 		exit(1);
@@ -119,11 +185,19 @@ int main(int argc, char *argv[])
 		printf("Usage: %s port\n", argv[0]);
 		exit(1);
 	}
+	*/
+	if(getcfg("sockcfg", "port", &port, GETCFG_INT32) != 0)
+	{
+		printf("cannot get cfg info \n");
+		exit(1);
+	}
+
 	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		printf("Socket error: %s\n", strerror(errno));
 		exit(1);
 	}
+	g_sockfd = sockfd;
 
 	bzero(&server_addr, sizeof(struct sockaddr_in));
 	server_addr.sin_family = AF_INET;
@@ -143,13 +217,12 @@ int main(int argc, char *argv[])
 		printf("Bind error:%s\n", strerror(errno));
 		exit(1);
 	}
-	printf("Bind server: %s\n", inet_ntoa(server_addr.sin_addr));
+	printf("Bind server: %s %d\n", inet_ntoa(server_addr.sin_addr), port);
 	if(listen(sockfd, BACKLOG) == -1)
 	{
 		printf("Listen error:%s\n", strerror(errno));
 		exit(1);
 	}
-	printf("Listen \n");
 
 	struct epoll_event ev, events[EVENTS];
 	int epfd = epoll_create(MAXCLIENTS);
@@ -158,6 +231,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "epoll_create error: %s\n\a", strerror(errno));
 		exit(1);
 	}
+	g_epfd = epfd;
 	printf("Socket: %d\n", sockfd);
 	printf("Epoll create: %d \n", epfd);
 
@@ -201,6 +275,7 @@ void data_in(int sockfd, int epfd)
 		if((byte = recv(sockfd, char_recv, BUFSIZE, 0)) < 0)
 		{
 			printf("recv error: %s\n", strerror(errno));
+			client_out(sockfd, epfd);
 		}
 		else if(byte > 0)
 		{
@@ -210,10 +285,17 @@ void data_in(int sockfd, int epfd)
 			for(i = 0; i < icount; i++)
 			{
 				printf("client %d is %d\n", i, SockClient[i]);
-				if(send(SockClient[i], char_recv, byte, 0) < 0)
-					printf("send error: %s\n", strerror(errno));
-				else
-					printf("send ok\n");
+//				if(sockfd != SockClient[i])
+				{
+					int size = 0;
+					if((size = send(SockClient[i], char_recv, byte, 0)) < 0)
+					{
+						printf("send error: %s\n", strerror(errno));
+						del_invalid_client(SockClient[i]);
+					}
+					else
+						printf("send ok, size is %d\n", size);
+				}
 			}
 		}
 	}
@@ -221,37 +303,54 @@ void data_in(int sockfd, int epfd)
 
 int client_in(int sockfd, int epfd)
 {
-	struct epoll_event ev;
-	struct sockaddr_in client_addr;
-	int sin_size = 0;
-	sin_size = sizeof(struct sockaddr_in);
-	int newsockfd = accept(sockfd, (struct sockaddr *)(&client_addr), (socklen_t *)&sin_size);
-	if(newsockfd == -1)
+	while(1)
 	{
-		printf("accept error:%s\n\a", strerror(errno));
-		exit(1);
-	}
+		struct epoll_event ev;
+		struct sockaddr_in client_addr;
+		int sin_size = 0;
+		sin_size = sizeof(struct sockaddr_in);
+		int newsockfd = accept(sockfd, (struct sockaddr *)(&client_addr), (socklen_t *)&sin_size);
+		if(newsockfd == -1)
+		{
+			printf("accept error:%s\n\a", strerror(errno));
+			exit(1);
+		}
 
-	ev.events = EPOLLIN;
-	ev.data.fd = newsockfd;
-	if(epoll_ctl(epfd, EPOLL_CTL_ADD, newsockfd, &ev) == -1)
-	{
-		fprintf(stderr, "epoll_ctl error: %s\n\a", strerror(errno));
-		close(newsockfd);
-		exit(1);
-	}
+		ev.events = EPOLLIN;
+		ev.data.fd = newsockfd;
+		if(epoll_ctl(epfd, EPOLL_CTL_ADD, newsockfd, &ev) == -1)
+		{
+			fprintf(stderr, "epoll_ctl error: %s\n\a", strerror(errno));
+			close(newsockfd);
+			exit(1);
+		}
 
-	char buf[] = "you are connected to server";
-	send(newsockfd, buf, sizeof(buf), 0);
-	printf("[Client in %s, fd is %d]\n", inet_ntoa(client_addr.sin_addr), newsockfd);
-	SockClient[icount++] = newsockfd;
-	set_keepalive(newsockfd, KEEPALIVE_IDEL, KEEPALIVE_CNT, KEEPALIVE_INTV);
-	return newsockfd;	
+	//	char buf[] = "you are connected to server";
+	//	send(newsockfd, buf, sizeof(buf), 0);
+		printf("[Client in %s, fd is %d]\n", inet_ntoa(client_addr.sin_addr), newsockfd);
+		SockClient[icount++] = newsockfd;
+		set_keepalive(newsockfd, KEEPALIVE_IDEL, KEEPALIVE_CNT, KEEPALIVE_INTV);
+		printf("Now Count is %d\n", icount);
+		return newsockfd;	
+	}
 }
 
 int client_out(int sockfd, int epfd)
 {
 	printf("[Client out %s, fd is %d]\n", getcliip(sockfd), sockfd);
+
+	if(epoll_ctl(epfd, EPOLL_CTL_DEL, sockfd, NULL) != 0)
+		printf("remove client error: %s[fd=%d]", strerror(errno), sockfd);
+
+	close(sockfd);
+
+	del_invalid_client(sockfd);
+
+	return 1;
+}
+
+void del_invalid_client(int sockfd)
+{
 	for(int i = 0; i < icount; i++)
 	{
 		if(sockfd == SockClient[i])

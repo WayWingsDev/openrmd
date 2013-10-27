@@ -39,7 +39,7 @@ static int logout_dvr(void *data, void *param)
 void CALLBACK realdata_callback(LONG hdl, DWORD type, BYTE *buff, DWORD bytes, 
 		void *arg)
 {
-	syslog(LOG_DEBUG, "Get data, the size is %d.\n)", bytes);
+//	syslog(LOG_DEBUG, "Get data, the size is %d.\n)", bytes);
 
 	realplay_info_t *info = (realplay_info_t *)arg;
 
@@ -50,11 +50,13 @@ void CALLBACK realdata_callback(LONG hdl, DWORD type, BYTE *buff, DWORD bytes,
 		if (info->hdr_cb)
 			info->hdr_cb((char *)buff, bytes, info->param);
 		if (info->media_hdr_sem) {
+			syslog(LOG_DEBUG, "media_hdr_sem %d", info->media_hdr_sem); 
 			info->media_hdr_len = (bytes > HDR_LEN_MAX) ?
 				HDR_LEN_MAX : bytes;
 			memcpy(info->media_hdr, buff, info->media_hdr_len);
 			sem_post(info->media_hdr_sem);
 		}
+		syslog(LOG_DEBUG, "receive sys head");
 	} else if (info->data_cb) {
 		info->data_cb((unsigned long)info, (char *)buff, bytes, 
 				info->param);
@@ -167,7 +169,7 @@ static int ptz_ctl(int login_id, int channel_id, ptz_ctl_info_t *info)
 		return NET_DVR_PTZPreset_Other(login_id, channel_id,
 				info->ctl_code, info->param1);
 
-	//printf("%d %d %d\n", info->ctl_code, stop, info->param1);
+	syslog(LOG_DEBUG, "loginid:%d channel:%d ctlcode:%d stop:%d param1:%d\n", login_id, channel_id, info->ctl_code, stop, info->param1);
 	return NET_DVR_PTZControlWithSpeed_Other(login_id, channel_id,
 			info->ctl_code, stop, info->param1);
 }
@@ -223,15 +225,18 @@ int special_get_describe(realplay_info_t *info, char **sdp)
 	SEM_TIMEDWAIT(info->media_hdr_sem, &ts, &ret);
 
 out:
+	syslog(LOG_DEBUG, "handle %d", handle);
 	if (handle != -1)
 		special_stop_realplay(handle);
 
 	if (info->media_hdr_sem) {
+		syslog(LOG_DEBUG, "media_hdr_sem %d", info->media_hdr_sem); 
 		sem_destroy(info->media_hdr_sem);
 		free(info->media_hdr_sem);
 	}
 
 	if (info->media_hdr) {
+		syslog(LOG_DEBUG, "media_hdr: %s", info->media_hdr);
 		if (ret != -1) {
 			sps = base64_encode((uint8_t *)info->media_hdr, 
 					info->media_hdr_len);
@@ -244,6 +249,7 @@ out:
 	if (ret == -1)
 		return -1;
 
+	syslog(LOG_DEBUG, "media_hdr base64 encode: %s", sps); 
 	normal_h264_sdp_content(info, sdp, sps, fps);
 	free(sps);
 	return 0;
@@ -267,7 +273,7 @@ unsigned long special_start_realplay(realplay_info_t *info)
 	handle->login_id = login_id;
 
 	//syslog(LOG_DEBUG, "channel %d", info->channel_id);
-//	cli_info.lChannel = info->channel_id;
+	cli_info.lChannel = info->channel_id;
 //	cli_info.lLinkMode = 0;		/* TCP */
 	/*
 	cli_info.hPlayWnd.x = 0;
