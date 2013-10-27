@@ -6,10 +6,6 @@ COPYRIGHT
 	It is distributed under the GNU General Public License - see the
 	accompanying COPYING file for more details. 
 
-HOMEPAGE
-	To find the latest news about openrmd, you can visit its homepage at 
-	<www.openrmd.org>.
-
 FEATURES
 	* Support RTSP/SIP to apply media data.
 	* Support TCP/RTP to transport data.
@@ -47,5 +43,3 @@ HOW TO TEST
 	cd test
 	./test 10
 
-AUTHOR
-	Fangxm <Fangxm@openrmd.org>
