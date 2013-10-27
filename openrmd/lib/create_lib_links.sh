@@ -12,7 +12,11 @@ ln -sv /usr/lib/libmysqlclient.so.16
 # hik
 if [ $# -eq 1 -a "$1" = "arch_x64" ] ; then
 	# arch_x64
+<<<<<<< HEAD
 	for file in ${thirdlib}/hik/lib64/{libStreamTransClient.so,libSystemTransform.so,libhcnetsdk.so,libhpr.so,libMPCtrl.so,libPlayCtrl.so}; do \
+=======
+	for file in ${thirdlib}/hik/lib64/{libStreamTransClient.so,libSystemTransform.so,libhcnetsdk.so,libhpr.so}; do \
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 		ln -sv $file
 	done
 else

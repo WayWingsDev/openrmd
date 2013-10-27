@@ -39,7 +39,11 @@ static int logout_dvr(void *data, void *param)
 void CALLBACK realdata_callback(LONG hdl, DWORD type, BYTE *buff, DWORD bytes, 
 		void *arg)
 {
+<<<<<<< HEAD
 //	syslog(LOG_DEBUG, "Get data, the size is %d.\n)", bytes);
+=======
+	syslog(LOG_DEBUG, "Get data, the size is %d.\n)", bytes);
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 
 	realplay_info_t *info = (realplay_info_t *)arg;
 
@@ -50,13 +54,19 @@ void CALLBACK realdata_callback(LONG hdl, DWORD type, BYTE *buff, DWORD bytes,
 		if (info->hdr_cb)
 			info->hdr_cb((char *)buff, bytes, info->param);
 		if (info->media_hdr_sem) {
+<<<<<<< HEAD
 			syslog(LOG_DEBUG, "media_hdr_sem %d", info->media_hdr_sem); 
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 			info->media_hdr_len = (bytes > HDR_LEN_MAX) ?
 				HDR_LEN_MAX : bytes;
 			memcpy(info->media_hdr, buff, info->media_hdr_len);
 			sem_post(info->media_hdr_sem);
 		}
+<<<<<<< HEAD
 		syslog(LOG_DEBUG, "receive sys head");
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 	} else if (info->data_cb) {
 		info->data_cb((unsigned long)info, (char *)buff, bytes, 
 				info->param);
@@ -169,7 +179,11 @@ static int ptz_ctl(int login_id, int channel_id, ptz_ctl_info_t *info)
 		return NET_DVR_PTZPreset_Other(login_id, channel_id,
 				info->ctl_code, info->param1);
 
+<<<<<<< HEAD
 	syslog(LOG_DEBUG, "loginid:%d channel:%d ctlcode:%d stop:%d param1:%d\n", login_id, channel_id, info->ctl_code, stop, info->param1);
+=======
+	//printf("%d %d %d\n", info->ctl_code, stop, info->param1);
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 	return NET_DVR_PTZControlWithSpeed_Other(login_id, channel_id,
 			info->ctl_code, stop, info->param1);
 }
@@ -225,18 +239,27 @@ int special_get_describe(realplay_info_t *info, char **sdp)
 	SEM_TIMEDWAIT(info->media_hdr_sem, &ts, &ret);
 
 out:
+<<<<<<< HEAD
 	syslog(LOG_DEBUG, "handle %d", handle);
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 	if (handle != -1)
 		special_stop_realplay(handle);
 
 	if (info->media_hdr_sem) {
+<<<<<<< HEAD
 		syslog(LOG_DEBUG, "media_hdr_sem %d", info->media_hdr_sem); 
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 		sem_destroy(info->media_hdr_sem);
 		free(info->media_hdr_sem);
 	}
 
 	if (info->media_hdr) {
+<<<<<<< HEAD
 		syslog(LOG_DEBUG, "media_hdr: %s", info->media_hdr);
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 		if (ret != -1) {
 			sps = base64_encode((uint8_t *)info->media_hdr, 
 					info->media_hdr_len);
@@ -249,7 +272,10 @@ out:
 	if (ret == -1)
 		return -1;
 
+<<<<<<< HEAD
 	syslog(LOG_DEBUG, "media_hdr base64 encode: %s", sps); 
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 	normal_h264_sdp_content(info, sdp, sps, fps);
 	free(sps);
 	return 0;
@@ -273,7 +299,11 @@ unsigned long special_start_realplay(realplay_info_t *info)
 	handle->login_id = login_id;
 
 	//syslog(LOG_DEBUG, "channel %d", info->channel_id);
+<<<<<<< HEAD
 	cli_info.lChannel = info->channel_id;
+=======
+//	cli_info.lChannel = info->channel_id;
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 //	cli_info.lLinkMode = 0;		/* TCP */
 	/*
 	cli_info.hPlayWnd.x = 0;
@@ -298,7 +328,11 @@ unsigned long special_start_realplay(realplay_info_t *info)
 #endif
 
 	handle->realplay_handle = NET_DVR_RealPlay_V30(login_id, &cli_info, 
+<<<<<<< HEAD
 			realdata_callback, handle, 1);
+=======
+			realdata_callback, handle, 0);
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 //	handle->realplay_handle = NET_DVR_RealPlay_V40(login_id, &preview_info, 
 //			realdata_callback, handle);
 	syslog(LOG_DEBUG, "NET_DVR_RealPlay_V30 %d", HIK_ENO);

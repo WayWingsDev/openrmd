@@ -45,7 +45,11 @@ static int logout_dvr(void *data, void *param)
 }
 
 static void realdata_callback(LONG hdl, DWORD type, BYTE *buff, DWORD bytes, 
+<<<<<<< HEAD
 /*	LONG param,*/ DWORD arg)
+=======
+	LONG param, DWORD arg)
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 {
 	realplay_info_t *info = (realplay_info_t *)arg;
 
@@ -54,10 +58,13 @@ static void realdata_callback(LONG hdl, DWORD type, BYTE *buff, DWORD bytes,
 		return;
 //	if ( 0 == type)
 		info->data_cb((unsigned long)info, (char *)buff, bytes, info->param);
+<<<<<<< HEAD
 //	static FILE *fpsave = NULL;
 //	if( fpsave == NULL)
 //		fpsave = fopen("./save.264", "w");
 //	fwrite(buff, 1, bytes, fpsave);
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 }
 /*
 #define NOACT	10001
@@ -217,8 +224,13 @@ unsigned long special_start_realplay(realplay_info_t *info)
 		syslog(LOG_DEBUG, "SDK_RealPlay error:%ld", ENO);
 		goto err;
 	}
+<<<<<<< HEAD
 	if (SDK_SetRealDataCallBack(handle->realplay_handle, 
 				realdata_callback, (DWORD)handle/*, 0x0000001*/) == 0) {
+=======
+	if (SDK_SetRealDataCallBackEx(handle->realplay_handle, 
+				realdata_callback, (DWORD)handle, 0x00000002) == 0) {
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 		syslog(LOG_DEBUG, "SDK_SetRealDataCallBackEx() error:%ld", 
 				ENO);
 		goto err;

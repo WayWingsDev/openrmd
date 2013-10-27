@@ -23,11 +23,24 @@ rmd_obj	= rmd.o rmd_devmgr.o rmd_sessmgr.o rmd_data_callback.o rmd_event.o
 # y: enable module
 # n: disable module
 
-CONFIG = TAM
+#CONFIG = TAM
+CONFIG = ZC
 #CONFIG = ELEC
 #CONFIG = CHAOYANG
 
 ifeq ($(CONFIG), TAM)
+	userlog	= y
+	rtspsvr	= y
+	sipuas	= y
+	udpsvr	= y
+	unix_domain_svr = y
+	rec	= y
+	ptz	= y
+
+	CFLAGS += -DRMD_DUMMY_INVITE
+endif
+
+ifeq ($(CONFIG), ZC)
 	userlog	= y
 	rtspsvr	= y
 	#sipuas	= y

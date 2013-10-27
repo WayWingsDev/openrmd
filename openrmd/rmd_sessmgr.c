@@ -476,7 +476,11 @@ int rmd_sessmgr_play_by_rec(channel_t *channel)
 	char opt[16];
 	int ret;
 
+<<<<<<< HEAD
 	if (channel->id != 0)
+=======
+	if (channel->id == 1)
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 		snprintf(opt, sizeof(opt), STREAMOPT_MAIN);
 	else
 		snprintf(opt, sizeof(opt), STREAMOPT_SUB);

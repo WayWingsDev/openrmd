@@ -68,7 +68,10 @@ static void event_ptzcontrol(const char *body)
 {
 #ifdef RMD_HAS_PTZ
 	ptz_info_t info;
+<<<<<<< HEAD
 	syslog(LOG_DEBUG, "%s", body);
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 
 	if (get_ptz_info(body, &info) != 0)
 		return;
@@ -156,7 +159,10 @@ void rmd_event_trigger_hangup(rmd_session_t *sess)
 void rmd_event_message_incoming(int msg_from_sip_thread, const char *msg_body)
 {
 	char e[32];
+<<<<<<< HEAD
 	syslog(LOG_DEBUG, "%s", msg_body);
+=======
+>>>>>>> 64d671fb5303708a1b14f1d09bf9a4c3f9b79e1c
 
 	if (get_xml_val(msg_body, "EventType", e, sizeof(e)) != 0)
 		return;
