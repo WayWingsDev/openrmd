@@ -23,8 +23,8 @@ rmd_obj	= rmd.o rmd_devmgr.o rmd_sessmgr.o rmd_data_callback.o rmd_event.o
 # y: enable module
 # n: disable module
 
-CONFIG = TAM
-#CONFIG = ZC
+#CONFIG = TAM
+CONFIG = ZC
 #CONFIG = ELEC
 #CONFIG = CHAOYANG
 
