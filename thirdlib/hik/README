@@ -1,0 +1,14 @@
+SDK version: 4.0.0.6
+
+login Hik DVR via telnet:
+--------------------------
+user: admin
+pwd : 12345
+
+usage:
+--------------------------
+1). Copy *.so to /usr/lib
+2). The original hcnetsdk.h can not compile use gcc, modify it:
+    o Add: extern "C" { ... }
+    o Comment all function' default parameter value: 
+      void foo(void *arg /*= NULL*/)

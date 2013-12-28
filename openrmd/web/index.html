@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>openrmd state</title>
+    <script language="javascript" src="ajax_func.js"></script>
+  </head>
+
+  <body>
+    <p><div id="state"></div></p>
+    <p><img id="openrmd_state"></img></p>
+    <p><div id="cameras"></div></p>
+
+    <script type="text/JavaScript">
+    deviceCfg();
+    setInterval(getProcessState,1000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+compile main program:
+	make
+
+compile drivers:
+	make drivers
+
+compile all (main program, drivers, et.):
+	make all
+
+install:
+	#make install
+	cp -rv openrmd rmd.conf device.conf lib <dist directory>
+
+clean main program:
+	make clean
+
+clean all:
+	make mrproper

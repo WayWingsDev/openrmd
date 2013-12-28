@@ -1,0 +1,15 @@
+CC	= cl
+LINK	= link
+CFLAGS	= /nologo /MT /W3 /wd4996 /O2 /D_WIN32_ /c
+LFLAGS	= /nologo /incremental:no /machine:I386
+
+all: stat_test.exe
+
+stat_test.exe: stat_test.obj
+	$(LINK) $(LFLAGS) -out:stat_test.exe $** rmdstat_sdk.lib
+
+stat_test.obj: stat_test.c
+	$(CC) $(CFLAGS) /c $*.c
+
+clean:
+	-@erase *.obj stat_test.exe

@@ -1,0 +1,40 @@
+Wed Mar 16 09:12:33 CST 2011
+	* add: eplcli.h, eplcli.c.
+
+Thu Mar 17 11:05:41 CST 2011
+	* add: add a API into eplcli.h: eplcli_extract_cmd().
+	* add: add a function: strnstr() (strnstr.h, strnstr.c).
+
+Mon Mar 28 17:22:55 CST 2011
+	* add: add API: udplsn (udplsn.h, udplsn.c), udpsock (udpsock.h,
+			udpsock.c).
+
+Thu May 26 22:11:38 CST 2011
+	* add: add API: evenbits_compl() to encrypt/de-encrypt a string(even 
+			bitwise complement).
+
+Mon May 30 08:48:46 CST 2011
+	* modify: modify the getcfg()'s parameters.
+
+Tue Jun 26 17:39:18 CST 2012
+	* Fix: In single_login() [single_login.c]:
+	int single_login(single_login_t *sl, single_login_func_t cb, char *ip, 
+			int port, char *user, char *pwd, void *param)
+	{
+		/* ... */
+
+		/* login */
+		loginid = login_func(ip, port, user, pwd, param);
+	*	if (loginid == -1) {
+			pthread_mutex_unlock(&sl->mtx);
+			return -1;
+		}
+
+		/* ... */
+	}
+	The old is "if (loginid < 0)", if the loginid is very big, it maybe 
+	will overflow.
+
+Mon Jul 23 09:12:51 CST 2012
+	* modify: modify the data structure's (dlist, slist, hash, vector,
+			stack, et.) interface.

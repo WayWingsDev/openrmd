@@ -1,0 +1,40 @@
+# common path
+topdir	  = /programs/openrmd
+finc	  = /programs/finc
+thirdlib  = /programs/thirdlib
+interface = $(topdir)
+specialipc= $(topdir)/driver/specialipc
+lpath	  = $(topdir)/lib
+rpath	  = ./lib
+
+frame_realplay = $(topdir)/driver/lib_frame_realplay.c
+frame_rec = $(topdir)/driver/lib_frame_rec.c
+
+# according to the directory named the device driver library name 
+libname = $(shell echo librmd_`basename $(CURDIR)`)
+
+CC	= gcc
+CP  = g++
+CFLAGS	+= -Wall -O2 -I$(finc) -I$(interface) -I$(CURDIR) -I..
+CFLAGS	+= -g
+LNKFLAGS = -Wl,-rpath,$(rpath) -L$(lpath) -lrtp
+
+#device driver type define
+CFLAGS += -DTYPE_DUMMY=0 \
+	-DTYPE_HIK=1 \
+	-DTYPE_DAHUA=2 \
+	-DTYPE_SONY=3 \
+	-DTYPE_AERO=4 \
+	-DTYPE_HANBANG=5 \
+	-DTYPE_AXIS=6 \
+	-DTYPE_HSN=7 \
+	-DTYPE_JXJ=8 \
+	-DTYPE_AMBARELLA=9 \
+	-DTYPE_YAAN=10 \
+	-DTYPE_YAANDVR=11 \
+	-DTYPE_ELEC=13 \
+	-DTYPE_CHAOYANG=14 \
+	-DTYPE_MYNVR=0 \
+	-DTYPE_BNNVR=10 \
+	-DTYPE_AERONVR=12 \
+	-DTYPE_ZXW=16

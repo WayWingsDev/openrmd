@@ -1,0 +1,51 @@
+WHAT IS OPENRMD?
+	Openrmd is an efficient framework for streaming media transport, it
+	supports any device through add own drivers.
+
+COPYRIGHT
+	It is distributed under the GNU General Public License - see the
+	accompanying COPYING file for more details. 
+
+HOMEPAGE
+	To find the latest news about openrmd, you can visit its homepage at 
+	<www.openrmd.org>.
+
+FEATURES
+	* Support RTSP/SIP to apply media data.
+	* Support TCP/RTP to transport data.
+	* One channel maximun support 1000 distribute at the same time.
+	* Support record media data into NVR.
+	* DVR and IP camera's number none limit.
+	* Modular design.
+
+LIMITS
+	Now only supports linux.
+
+USAGE
+	* Run openrmd:
+	./openrmd [OPTIONS] ...
+
+	The options are: 
+	-d   Run as as debug mode, and print debug message on console.
+	-c   Dump core file.
+	-v   Print version.
+	-h   Show this help message.
+
+	* Watch openrmd's log:
+	tail -f /var/log/openrmd.log
+
+HOW TO TEST
+	1) Run openrmd:
+	./openrmd
+	
+	2) Run the dummy device:
+	cd driver/dummy
+	make dummy
+	./dummy -p 7000 -f dummy.avi -d
+
+	3) Run the test program (open ten processes):
+	cd test
+	./test 10
+
+AUTHOR
+	Fangxm <Fangxm@openrmd.org>

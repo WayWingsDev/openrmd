@@ -1,0 +1,7 @@
+File structure:
+	[ds] - data structure.
+	[test] - test programs.
+
+Usage:
+	1. You can add the tags file into ~/.vimrc:
+		set tags+=/programs/finc/tags
